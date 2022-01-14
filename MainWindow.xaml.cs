@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace CurrencyConverter
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Currency Converter Project
     /// </summary>
     public partial class MainWindow : Window
     {
