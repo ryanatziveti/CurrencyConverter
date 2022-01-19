@@ -74,7 +74,7 @@ namespace CurrencyConverter
                         var ResponseString = await response.Content.ReadAsStringAsync();  //Serialize the HTTP content to a string
                         var ResponseObject = JsonConvert.DeserializeObject<Root>(ResponseString); 
 
-                        MessageBox.Show("Timestamp: " + ResponseObject.timestamp, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        //MessageBox.Show("License: " + ResponseObject.license, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
 
                         return ResponseObject;  //Return API response
                     }
@@ -93,26 +93,31 @@ namespace CurrencyConverter
         private void BindCurrency()
         {
             //Create a Datatable Object
-            DataTable dtCurrency = new DataTable();
+            DataTable dt = new DataTable();
 
             //Add the text column in the DataTable
-            dtCurrency.Columns.Add("Text");
+            dt.Columns.Add("Text");
 
             //Add the value column in the DataTable
-            dtCurrency.Columns.Add("Value");
+            dt.Columns.Add("Value");
 
             //Add rows in the Datatable with text and value
-            //the value is used for calculating the coversion
-            dtCurrency.Rows.Add("--SELECT--", 0);
-            dtCurrency.Rows.Add("INR", 1);
-            dtCurrency.Rows.Add("USD", 75);
-            dtCurrency.Rows.Add("EUR", 85);
-            dtCurrency.Rows.Add("SAR", 20);
-            dtCurrency.Rows.Add("POUND", 5);
-            dtCurrency.Rows.Add("DEM", 43);
+            //Only pulling in what we specified in the RATE object
+            dt.Rows.Add("--SELECT--", 0);
+            dt.Rows.Add("INR", val.rates.INR);
+            dt.Rows.Add("USD", val.rates.USD);
+            dt.Rows.Add("NZD", val.rates.NZD);
+            dt.Rows.Add("JPY", val.rates.JPY);
+            dt.Rows.Add("EUR", val.rates.EUR);
+            dt.Rows.Add("CAD", val.rates.CAD);
+            dt.Rows.Add("ISK", val.rates.ISK);
+            dt.Rows.Add("PHP", val.rates.PHP);
+            dt.Rows.Add("DKK", val.rates.DKK);
+            dt.Rows.Add("CZK", val.rates.CZK);
+
 
             //Datatable data assigned from the currency combobox
-            cmbFromCurrency.ItemsSource = dtCurrency.DefaultView;
+            cmbFromCurrency.ItemsSource = dt.DefaultView;
 
             //DisplayMemberPath property is used to display data in the combobox
             cmbFromCurrency.DisplayMemberPath = "Text";
@@ -124,7 +129,7 @@ namespace CurrencyConverter
             cmbFromCurrency.SelectedIndex = 0;
 
             //All properties are set to To Currency combobox as it is in the From Currency combobox
-            cmbToCurrency.ItemsSource = dtCurrency.DefaultView;
+            cmbToCurrency.ItemsSource = dt.DefaultView;
             cmbToCurrency.DisplayMemberPath = "Text";
             cmbToCurrency.SelectedValuePath = "Value";
             cmbToCurrency.SelectedIndex = 0;
@@ -185,7 +190,9 @@ namespace CurrencyConverter
                 //Calculation for currency converter is From Currency value multiply(*) 
                 //With the amount textbox value and then that total divided(/) with To Currency value
                 // (amount * fromCurrency value) / toCurrency value <--static, not dyamic at all
-                ConvertedValue = (double.Parse(cmbFromCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) / double.Parse(cmbToCurrency.SelectedValue.ToString());
+                ConvertedValue = (double.Parse(cmbToCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) 
+                    / double.Parse(cmbFromCurrency.SelectedValue.ToString());
+                
 
                 //Show the label converted currency and converted currency name.
                 lblCurrency.Content = cmbToCurrency.Text + " " + ConvertedValue.ToString("N3");

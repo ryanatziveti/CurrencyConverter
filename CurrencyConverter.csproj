@@ -107,5 +107,9 @@
   <ItemGroup>
     <Folder Include="Fonts\" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Logo.png" />
+    <Resource Include="Images\money.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
