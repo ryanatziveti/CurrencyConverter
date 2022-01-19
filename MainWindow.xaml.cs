@@ -2,8 +2,10 @@
 using System.Windows.Input;
 using System.Data;
 using System.Text.RegularExpressions;
-
-
+using System.Net.Http;
+using System.Threading.Tasks;
+using System;
+using Newtonsoft.Json;
 
 namespace CurrencyConverter
 {
@@ -12,20 +14,83 @@ namespace CurrencyConverter
     /// </summary>
     public partial class MainWindow : Window
     {
+        Root val = new Root(); //used in GetValue();
+
+        public class Root
+        {
+            public Rate rates { get; set; }
+            public long timestamp { get; set; }
+            public string license;
+        }
+
+        public class Rate
+        {
+            //Return value names
+            public double INR { get; set; }
+            public double JPY { get; set; }
+            public double USD { get; set; }
+            public double NZD { get; set; }
+            public double EUR { get; set; }
+            public double CAD { get; set; }
+            public double ISK { get; set; }
+            public double PHP { get; set; }
+            public double DKK { get; set; }
+            public double CZK { get; set; }
+        }
+
+
         public MainWindow()
         {
             InitializeComponent();
 
             //ClearControls method is used to clear all control values
             ClearControls();
+            GetValue();
 
             //BindCurrency is used to bind currency name with the value in the Combobox
+            //BindCurrency();
+
+
+        }
+
+
+        private async void GetValue()
+        {
+            val = await GetData<Root>("https://openexchangerates.org/api/latest.json?app_id=269088332f224391983dc5f512f1e5d0");
             BindCurrency();
         }
 
+        public static async Task<Root> GetData<T>(string url)
+        {
+            var myRoot = new Root();
+            try
+            {
+                using(var client = new HttpClient())  //HttpClient class provides a base class for sending/receiving the HTTP request (Code 200)
+                {
+                    client.Timeout = TimeSpan.FromMinutes(1);  //The timespan to wait before the request times out
+                    HttpResponseMessage response = await client.GetAsync(url);  //HttpResponseMessage is a way of returning a message
+                    if(response.StatusCode == System.Net.HttpStatusCode.OK)  //Check API response status code ok
+                    {
+                        var ResponseString = await response.Content.ReadAsStringAsync();  //Serialize the HTTP content to a string
+                        var ResponseObject = JsonConvert.DeserializeObject<Root>(ResponseString); 
+
+                        MessageBox.Show("Timestamp: " + ResponseObject.timestamp, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        return ResponseObject;  //Return API response
+                    }
+                    return myRoot;
+                }
+            }
+            catch
+            {
+                return myRoot;
+            }
+        }
+
+
+
         #region Bind Currency From and To Combobox
         private void BindCurrency()
-
         {
             //Create a Datatable Object
             DataTable dtCurrency = new DataTable();
